@@ -23,5 +23,11 @@ dist-ssr
 *.sln
 *.sw?
 
-
-.env.local
+# Misc
+.env
+.env.*
+.local
+npm-debug.log
+yarn-error.log
+.DS_Store
+*.tgz
