@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { SWATCHES } from '@/constants';
-import { ColorSwatch, Group } from "@mantine/core";
+import { ColorSwatch, Group, Slider } from "@mantine/core";
 import { Button } from "@/components/ui/button";
 import Draggable from 'react-draggable';
 import axios from 'axios';
@@ -27,6 +27,8 @@ export default function Home() {
     const [latexExpression, setLatexExpression] = useState<Array<string>>([]);
     const [latexPosition, setLatexPosition] = useState({x: 10, y:200});
     const [dictOfVars, setDictOfVars] = useState({});
+    const [isEraser, setIsEraser] = useState(false); // State for eraser
+    const [lineWidth, setLineWidth] = useState(3); // State for line size
 
     useEffect(() => {
         if (reset) {
@@ -187,7 +189,9 @@ export default function Home() {
         if (canvas) {
             const ctx = canvas.getContext('2d');
             if (ctx) {
-                ctx.strokeStyle = color; 
+                ctx.strokeStyle = color;
+                ctx.lineWidth = lineWidth; // Use the current line width
+                ctx.strokeStyle = isEraser ? 'black' : color;
                 ctx.lineTo(e.nativeEvent.offsetX, e.nativeEvent.offsetY);
                 ctx.stroke();
             }
@@ -196,33 +200,52 @@ export default function Home() {
 
     return (
         <div className="relative h-screen">
-            <div className="grid grid-cols-3 gap-2 z-20 relative">
-                <Button
-                    onClick={() => setReset(true)}
-                    className='bg-black text-white'
-                    variant='default'
-                    color='black'
-                >
-                    Reset
-                </Button>
-                <Group>
-                    {SWATCHES.map((swatchColor: string) => (
-                        <ColorSwatch
-                            key={swatchColor}
-                            color={swatchColor}
-                            onClick={() => setColor(swatchColor)}
-                        />
-                    ))}
-                </Group>
-                <Button
-                    onClick={sendData}
-                    className='bg-black text-white'
-                    variant='default'
-                    color='black'
-                >
-                    Calculate
-                </Button>
-            </div>
+            <div className="flex justify-between items-center z-20 relative p-4">
+            <Button
+                onClick={() => setReset(true)}
+                className='bg-red-500 text-white w-32'
+                variant='default'
+                color='red'
+            >
+                Reset
+            </Button>
+            <Group>
+                {SWATCHES.map((swatchColor: string) => (
+                    <ColorSwatch
+                        key={swatchColor}
+                        color={swatchColor}
+                        onClick={() => {
+                            setColor(swatchColor);
+                            setIsEraser(false); // Switch to drawing mode when color is selected
+                        }}
+                    />
+                ))}
+            </Group>
+            <Button
+                onClick={() => setIsEraser(!isEraser)} // Toggle eraser mode
+                className='bg-yellow-500 text-white w-32'
+                variant='default'
+                color='yellow'
+            >
+                {isEraser ? 'Drawing' : 'Eraser'}
+            </Button>
+            <input
+                type="range"
+                min="1"
+                max="10"
+                value={lineWidth}
+                onChange={(e) => setLineWidth(parseInt(e.target.value))}
+                className="w-32"
+            />
+            <Button
+                onClick={sendData}
+                className='bg-green-500 text-white w-32'
+                variant='default'
+                color='green'
+            >
+                Calculate
+            </Button>
+        </div>
             <canvas
                 ref={canvasRef}
                 id='canvas'
@@ -249,7 +272,7 @@ export default function Home() {
             ))}
             <footer className="fixed bottom-0 left-0 right-0 bg-black text-white p-4">
                 <div className="flex justify-between items-center">
-                    <p>Developed by Kishan Patel</p>
+                    <p>Developed by Kishan Patel 👨‍💻</p>
                     <div className="flex space-x-4">
                         <a href="https://www.linkedin.com/in/kishan-patel-dev/" target="_blank" rel="noopener noreferrer">
                             <FontAwesomeIcon icon={faLinkedin} size="lg" />
