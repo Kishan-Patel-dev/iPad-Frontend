@@ -205,15 +205,15 @@ export default function Home() {
                 >
                     Reset
                 </Button>
-                <div className="flex items-center space-x-2">
-                    {/* Color Picker */}
-                    <input
-                        type="color"
-                        value={color}
-                        onChange={(e) => setColor(e.target.value)}
-                        className="border-none"
-                    />
-                </div>
+                <Group>
+                    {SWATCHES.map((swatchColor: string) => (
+                        <ColorSwatch
+                            key={swatchColor}
+                            color={swatchColor}
+                            onClick={() => setColor(swatchColor)}
+                        />
+                    ))}
+                </Group>
                 <Button
                     onClick={sendData}
                     className='bg-black text-white'
